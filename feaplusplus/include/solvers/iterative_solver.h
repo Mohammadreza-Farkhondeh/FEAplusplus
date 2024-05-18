@@ -1,7 +1,7 @@
 #ifndef ITERATIVE_SOLVER_H
 #define ITERATIVE_SOLVER_H
 
-#include "solver.h"
+#include "solvers/solver.h"
 
 class IterativeSolver : public Solver {
 public:

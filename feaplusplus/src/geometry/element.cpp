@@ -1,4 +1,5 @@
 #include "geometry/element.h"
+#include "common/common.h"
 
 Element::Element(const std::vector<Node*>& nodes, const Material& material)
     : nodes(nodes), material(material) {}

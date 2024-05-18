@@ -1,7 +1,7 @@
 #ifndef DIRECT_SOLVER_H
 #define DIRECT_SOLVER_H
 
-#include "solver.h"
+#include "solvers/solver.h"
 
 class DirectSolver : public Solver {
 public:

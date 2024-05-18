@@ -1,7 +1,7 @@
 #ifndef SPARSE_SOLVER_H
 #define SPARSE_SOLVER_H
 
-#include "solver.h"
+#include "solvers/solver.h"
 
 class SparseSolver : public Solver {
 public:

@@ -1,4 +1,4 @@
-#include "direct_solver.h"
+#include "solvers/direct_solver.h"
 
 void DirectSolver::solve(const Mesh& mesh) const {
 }

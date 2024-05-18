@@ -8,6 +8,10 @@
 class FEA {
 public:
     FEA();
+    
+    void setSolver(Solver* solver) {
+        this->solver = solver;
+    }
 
     void setupModel(const Mesh& mesh);
     void analyze();
@@ -16,7 +20,7 @@ public:
 
 private:
     Mesh mesh;
-    Solver solver;
+    Solver* solver;
     Postprocessor postprocessor;
 };
 

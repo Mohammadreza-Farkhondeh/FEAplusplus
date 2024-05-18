@@ -11,12 +11,14 @@ public:
     double getPoissonRatio() const;
     double getDensity() const;
     double getYieldStrength() const;
+    double getShearModulus() const;
 
 private:
     double youngsModulus;    // Young's Modulus (E)
     double poissonRatio;     // Poisson's Ratio (ν)
     double density;          // Density (ρ)
     double yieldStrength;    // Yield Strength (σ_y)
+    
 };
 
 #endif // MATERIAL_H

@@ -4,6 +4,7 @@
 #include <vector>
 #include "geometry/node.h"
 #include "material/material.h"
+#include "common/common.h"
 
 class Element {
 public:

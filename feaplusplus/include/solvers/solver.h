@@ -1,7 +1,7 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 
-#include "mesh.h"
+#include "fea/mesh.h"
 
 class Solver {
 public:
