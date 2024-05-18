@@ -1,21 +1,19 @@
-#ifndef FEAPLUSPLUS_NODE_H
-#define FEAPLUSPLUS_NODE_H
+#ifndef NODE_H
+#define NODE_H
+
+#include <vector>
 
 class Node {
 public:
-  // Constructor to initialize node coordinates
-  Node(double x, double y, double z = 0.0);
-
-  // Getters for node coordinates
-  double get_x() const { return x_; }
-  double get_y() const { return y_; }
-  double get_z() const { return z_; }
+    Node(double x, double y, double z);
+    void applyBoundaryCondition(int dofIndex, double value);
+    void setDisplacement(int dofIndex, double displacement);
+    double getDisplacement(int dofIndex) const;
+    std::vector<double> getCoordinates() const;
 
 private:
-  // Member variables to store coordinates
-  double x_;
-  double y_;
-  double z_;
+    std::vector<double> coordinates;
+    std::vector<double> displacements;
 };
 
-#endif
+#endif // NODE_H
