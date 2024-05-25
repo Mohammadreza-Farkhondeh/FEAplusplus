@@ -5,7 +5,7 @@
 
 class IterativeSolver : public Solver {
 public:
-    virtual void solve(const Mesh& mesh) const override;
+    void solve(const Mesh& mesh) const override;
 };
 
 #endif // ITERATIVE_SOLVER_H
