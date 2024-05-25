@@ -9,14 +9,15 @@
 class Element {
 public:
     Element(const std::vector<Node*>& nodes, const Material& material);
+    
     const std::vector<Node*>& getNodes() const;
     Matrix computeStiffnessMatrix() const;
     void assemble(Matrix& globalStiffnessMatrix, const std::vector<int>& dofMap) const;
+    std::vector<int> getDOFMap() const;
 
 private:
     std::vector<Node*> nodes;
     Material material;
-    std::vector<std::vector<int>> connectivity;
 };
 
 #endif // ELEMENT_H
