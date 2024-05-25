@@ -1,12 +1,9 @@
-#include "loads/distributed_load.h"
+#include "distributed_load.h"
 
-DistributedLoad::DistributedLoad(double magnitude, const std::vector<Node>& nodes)
-    : magnitude(magnitude), nodes(nodes) {}
+DistributedLoad::DistributedLoad(double magnitude, const std::vector<Node*>& nodes) : magnitude(magnitude), nodes(nodes) {}
 
-double DistributedLoad::getMagnitude() const {
-    return magnitude;
-}
-
-std::vector<Node> DistributedLoad::getNodes() const {
-    return nodes;
+void DistributedLoad::apply(Node& node) const {
+    for (Node* n : nodes) {
+        n->applyLoad(magnitude / nodes.size(), magnitude / nodes.size(), magnitude / nodes.size());
+    }
 }

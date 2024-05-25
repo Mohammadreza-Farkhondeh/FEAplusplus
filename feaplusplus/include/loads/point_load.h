@@ -6,14 +6,12 @@
 
 class PointLoad : public Load {
 public:
-    PointLoad(double magnitude, const Node& node);
+    PointLoad(double fx, double fy, double fz);
 
-    double getMagnitude() const;
-    Node getNode() const;
+    void apply(Node& node) const override;
 
 private:
-    double magnitude; // Magnitude of the load
-    Node node;        // Node at which the load is applied
+    double fx, fy, fz;
 };
 
 #endif // POINT_LOAD_H

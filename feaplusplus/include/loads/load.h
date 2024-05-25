@@ -5,7 +5,7 @@
 
 class Load {
 public:
-    virtual void apply(const Node& node) const = 0;
+    virtual void apply(Node& node) const = 0;
 };
 
 #endif // LOAD_H
