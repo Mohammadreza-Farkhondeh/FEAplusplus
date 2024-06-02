@@ -1,10 +1,10 @@
 #include "material/material.h"
 
-Material::Material(double youngsModulus, double poissonRatio, double density, double yieldStrength)
-    : youngsModulus(youngsModulus), poissonRatio(poissonRatio), density(density), yieldStrength(yieldStrength) {}
+Material::Material(double elasticModulus, double poissonRatio, double density, double yieldStrength)
+    : elasticsModulus(elasticModulus), poissonRatio(poissonRatio), density(density), yieldStrength(yieldStrength) {}
 
-double Material::getYoungsModulus() const {
-    return youngsModulus;
+double Material::getElasticModulus() const {
+    return elasticsModulus;
 }
 
 double Material::getPoissonRatio() const {

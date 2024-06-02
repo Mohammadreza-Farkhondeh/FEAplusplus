@@ -1,4 +1,4 @@
-#include "geomtry/element.h"
+#include "geometry/element.h"
 #include <cmath>
 
 Element::Element(const std::vector<Node*>& nodes, const Material& material) 
