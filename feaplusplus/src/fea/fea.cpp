@@ -8,7 +8,7 @@ void FEA::setSolver(Solver* solver) {
 
 void FEA::setupModel(const Mesh& mesh) {
     this->mesh = mesh;
-    mesh.generateStiffnessMatrix();
+    this->mesh.generateStiffnessMatrix();
 }
 
 void FEA::analyze() {

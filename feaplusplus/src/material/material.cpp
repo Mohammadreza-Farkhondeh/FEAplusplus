@@ -4,7 +4,7 @@ Material::Material(double elasticModulus, double poissonRatio, double density, d
     : elasticsModulus(elasticModulus), poissonRatio(poissonRatio), density(density), yieldStrength(yieldStrength) {}
 
 double Material::getElasticModulus() const {
-    return elasticsModulus;
+    return elasticModulus;
 }
 
 double Material::getPoissonRatio() const {

@@ -16,12 +16,9 @@ public:
     void addNode(const Node& node);
     void addElement(const Element& element);
 
-    // Method to assign material to an element
-    void assignMaterial(Element& element, const Material& material);
-
     // Methods to apply boundary conditions and loads
-    void applyBoundaryCondition(Node& node, int dofIndex, double value);
-    void applyLoad(Node& node, const Load& load);
+    void applyBoundaryCondition(const Node& node, int dofIndex, double value);
+    void applyLoad(const Node& node, const Load& load);
 
     // Method to generate the global stiffness matrix
     void generateStiffnessMatrix();
@@ -39,8 +36,8 @@ private:
     std::vector<Element> elements;
     Matrix globalStiffnessMatrix;
     Vector globalForceVector;
-    std::unordered_map<Node, std::vector<std::pair<int, double>>> boundaryConditions; // Node -> (DOF, value)
-    std::unordered_map<Node, std::vector<Load>> loads; // Node -> Loads
+    std::unordered_map<const Node*, std::vector<std::pair<int, double>>> boundaryConditions; // Node -> (DOF, value)
+    std::unordered_map<const Node*, std::vector<Load>> loads; // Node -> Loads
 };
 
 #endif // MESH_H
