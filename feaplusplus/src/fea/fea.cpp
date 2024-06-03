@@ -3,26 +3,26 @@
 FEA::FEA() : solver(nullptr) {}
 
 void FEA::setSolver(Solver* solver) {
-    this->solver = solver;
+  this->solver = solver;
 }
 
 void FEA::setupModel(const Mesh& mesh) {
-    this->mesh = mesh;
-    this->mesh.generateStiffnessMatrix();
+  this->mesh = mesh;
+  this->mesh.generateStiffnessMatrix();
 }
 
 void FEA::analyze() {
-    if (solver) {
-        solver->solve(mesh);
-    } else {
-        std::cerr << "No solver set!" << std::endl;
-    }
+  if (solver) {
+    solver->solve(mesh);
+  } else {
+    std::cerr << "No solver set!" << std::endl;
+  }
 }
 
 void FEA::visualizeResults() {
-    postprocessor.visualize(mesh);
+  postprocessor.visualize(mesh);
 }
 
 void FEA::generateReport() {
-    postprocessor.generateReport(mesh);
+  postprocessor.generateReport(mesh);
 }
