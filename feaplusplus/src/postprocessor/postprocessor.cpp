@@ -1,15 +1,16 @@
 #include "postprocessor.h"
+#include "common/analysis_result.h"
 
 Postprocessor::Postprocessor() {}
 
-void Postprocessor::calculateStresses(const Mesh& mesh) {
+std::vector<AnalysisResult> Postprocessor::calculateStresses(const Mesh& mesh) {
+  std::vector<AnalysisResult> results;
   const auto& elements = mesh.getElements();
   for (const auto& element : elements) {
     const auto& nodes = element.getNodes();
     size_t numNodes = nodes.size();
     size_t numDOF = numNodes * 3;  // Assuming 3 DOF per node
 
-    // Extract displacement vector for the element
     Vector displacementVector(numDOF);
     for (size_t i = 0; i < numNodes; ++i) {
       for (int j = 0; j < 3; ++j) {
@@ -17,20 +18,20 @@ void Postprocessor::calculateStresses(const Mesh& mesh) {
       }
     }
 
-    // Calculate stress for the element
     double stress = calculateElementStress(element, displacementVector);
-    // Output or store stress data as needed
+    results.push_back({element.getId(), stress, 0.0, 0.0, 0.0});
   }
+  return results;
 }
 
-void Postprocessor::calculateStrains(const Mesh& mesh) {
+std::vector<AnalysisResult> Postprocessor::calculateStrains(const Mesh& mesh) {
+  std::vector<AnalysisResult> results;
   const auto& elements = mesh.getElements();
   for (const auto& element : elements) {
     const auto& nodes = element.getNodes();
     size_t numNodes = nodes.size();
     size_t numDOF = numNodes * 3;  // Assuming 3 DOF per node
 
-    // Extract displacement vector for the element
     Vector displacementVector(numDOF);
     for (size_t i = 0; i < numNodes; ++i) {
       for (int j = 0; j < 3; ++j) {
@@ -38,20 +39,20 @@ void Postprocessor::calculateStrains(const Mesh& mesh) {
       }
     }
 
-    // Calculate strain for the element
     double strain = calculateElementStrain(element, displacementVector);
-    // Output or store strain data as needed
+    results.push_back({element.getId(), 0.0, strain, 0.0, 0.0});
   }
+  return results;
 }
 
-void Postprocessor::calculateMoments(const Mesh& mesh) {
+std::vector<AnalysisResult> Postprocessor::calculateMoments(const Mesh& mesh) {
+  std::vector<AnalysisResult> results;
   const auto& elements = mesh.getElements();
   for (const auto& element : elements) {
     const auto& nodes = element.getNodes();
     size_t numNodes = nodes.size();
     size_t numDOF = numNodes * 3;  // Assuming 3 DOF per node
 
-    // Extract displacement vector for the element
     Vector displacementVector(numDOF);
     for (size_t i = 0; i < numNodes; ++i) {
       for (int j = 0; j < 3; ++j) {
@@ -59,20 +60,20 @@ void Postprocessor::calculateMoments(const Mesh& mesh) {
       }
     }
 
-    // Calculate moment for the element
     double moment = calculateElementMoment(element, displacementVector);
-    // Output or store moment data as needed
+    results.push_back({element.getId(), 0.0, 0.0, moment, 0.0});
   }
+  return results;
 }
 
-void Postprocessor::calculateShears(const Mesh& mesh) {
+std::vector<AnalysisResult> Postprocessor::calculateShears(const Mesh& mesh) {
+  std::vector<AnalysisResult> results;
   const auto& elements = mesh.getElements();
   for (const auto& element : elements) {
     const auto& nodes = element.getNodes();
     size_t numNodes = nodes.size();
     size_t numDOF = numNodes * 3;  // Assuming 3 DOF per node
 
-    // Extract displacement vector for the element
     Vector displacementVector(numDOF);
     for (size_t i = 0; i < numNodes; ++i) {
       for (int j = 0; j < 3; ++j) {
@@ -80,24 +81,19 @@ void Postprocessor::calculateShears(const Mesh& mesh) {
       }
     }
 
-    // Calculate shear for the element
     double shear = calculateElementShear(element, displacementVector);
-    // Output or store shear data as needed
+    results.push_back({element.getId(), 0.0, 0.0, 0.0, shear});
   }
+  return results;
 }
 
 double Postprocessor::calculateElementStress(
     const Element& element,
     const Vector& displacementVector) const {
-  // Assuming linear elastic material properties
   const auto& material = element.getMaterial();
-  double E = material.getElasticModulus();    // Elastic Modulus
-  double A = material.getCrossSectionArea();  // Cross-sectional Area
+  double E = material.getElasticModulus();
 
-  // Compute strain for the element
   double strain = calculateElementStrain(element, displacementVector);
-
-  // Compute stress using Hooke's Law
   double stress = E * strain;
 
   return stress;
@@ -106,11 +102,39 @@ double Postprocessor::calculateElementStress(
 double Postprocessor::calculateElementStrain(
     const Element& element,
     const Vector& displacementVector) const {
-  // Placeholder implementation; actual implementation depends on element type
-  // and material properties For linear elements, strain can be calculated from
-  // displacements For nonlinear elements, strain calculation can be more
-  // complex
+  const auto& nodes = element.getNodes();
+  if (nodes.size() != 2) {
+    throw std::invalid_argument(
+        "Element should have exactly two nodes for strain calculation.");
+  }
+
+  double lengthInitial =
+      (nodes[1]->getCoordinates() - nodes[0]->getCoordinates()).norm();
+  double lengthCurrent =
+      ((nodes[1]->getCoordinates() + nodes[1]->getDisplacements()) -
+       (nodes[0]->getCoordinates() + nodes[0]->getDisplacements()))
+          .norm();
+
+  double strain = (lengthCurrent - lengthInitial) / lengthInitial;
+  return strain;
+}
+
+double Postprocessor::calculateElementMoment(
+    const Element& element,
+    const Vector& displacementVector) const {
+  // Placeholder implementation
+  // For truss elements, moments are typically zero as they do not resist
+  // bending For beam elements, a more complex calculation is needed considering
+  // beam theory
   return 0.0;
 }
 
-// double Postprocessor::calculateElementMoment
+double Postprocessor::calculateElementShear(
+    const Element& element,
+    const Vector& displacementVector) const {
+  // Placeholder implementation
+  // For truss elements, shear is typically zero as they do not resist shear
+  // forces For beam elements, a more complex calculation is needed considering
+  // shear force distribution
+  return 0.0;
+}
