@@ -8,11 +8,8 @@
 class FEA {
 public:
     FEA();
-    
-    void setSolver(Solver* solver) {
-        this->solver = solver;
-    }
 
+    void setSolver(Solver* solver);
     void setupModel(const Mesh& mesh);
     void analyze();
     void visualizeResults();

@@ -3,17 +3,19 @@
 
 #include "geometry/node.h"
 #include "loads/load.h"
+#include <vector>
+#include <functional>
 
 class DistributedLoad : public Load {
 public:
-    DistributedLoad(double magnitude, const std::vector<Node>& nodes);
+    DistributedLoad(double totalLoad, const std::vector<Node*>& nodes, std::function<std::vector<double>(const std::vector<Node*>&)> distributionFunction);
 
-    double getMagnitude() const;
-    std::vector<Node> getNodes() const;
+    void apply(Node& node) const override;
 
 private:
-    double magnitude;          // Magnitude of the load
-    std::vector<Node> nodes;  // Nodes to which the load is applied
+    double totalLoad;
+    std::vector<Node*> nodes;
+    std::function<std::vector<double>(const std::vector<Node*>&)> distributionFunction;
 };
 
 #endif // DISTRIBUTED_LOAD_H

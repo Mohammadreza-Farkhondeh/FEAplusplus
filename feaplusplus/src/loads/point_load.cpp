@@ -1,12 +1,8 @@
-#include "loads/point_load.h"
+#include "point_load.h"
 
-PointLoad::PointLoad(double magnitude, const Node& node)
-    : magnitude(magnitude), node(node) {}
+PointLoad::PointLoad(double fx, double fy, double fz)
+    : fx(fx), fy(fy), fz(fz) {}
 
-double PointLoad::getMagnitude() const {
-    return magnitude;
-}
-
-Node PointLoad::getNode() const {
-    return node;
+void PointLoad::apply(Node& node) const {
+  node.applyLoad(fx, fy, fz);
 }

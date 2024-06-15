@@ -5,16 +5,16 @@
 
 class Material {
 public:
-    Material(double youngsModulus, double poissonRatio, double density, double yieldStrength);
+    Material(double elasticModulus, double poissonRatio, double density, double yieldStrength);
     
-    double getYoungsModulus() const;
+    double getElasticModulus() const;
     double getPoissonRatio() const;
     double getDensity() const;
     double getYieldStrength() const;
     double getShearModulus() const;
 
 private:
-    double youngsModulus;    // Young's Modulus (E)
+    double elasticModulus;    // elastic Modulus (E)
     double poissonRatio;     // Poisson's Ratio (ν)
     double density;          // Density (ρ)
     double yieldStrength;    // Yield Strength (σ_y)
