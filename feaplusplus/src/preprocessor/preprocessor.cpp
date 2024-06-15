@@ -6,12 +6,10 @@ void Preprocessor::generateMesh(
     const std::vector<std::vector<double>>& nodeCoordinates,
     const std::vector<std::vector<int>>& elementConnectivity,
     const std::vector<Material>& materials) {
-  // Create nodes
   for (const auto& coord : nodeCoordinates) {
     mesh.addNode(Node(coord[0], coord[1], coord[2]));
   }
 
-  // Create elements
   for (size_t i = 0; i < elementConnectivity.size(); ++i) {
     std::vector<Node*> elementNodes;
     for (const auto& nodeIndex : elementConnectivity[i]) {
@@ -46,9 +44,7 @@ void Preprocessor::applyLoads(
   }
 }
 
-void Preprocessor::preprocess() {
-  // Additional preprocessing steps can be added here if necessary
-}
+void Preprocessor::preprocess() {}
 
 const Mesh& Preprocessor::getMesh() const {
   return mesh;

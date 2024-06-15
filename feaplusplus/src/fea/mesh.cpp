@@ -12,6 +12,10 @@ void Mesh::addElement(const Element& element) {
   elements.push_back(element);
 }
 
+void Mesh::assignMaterial(Element& element, const Material& material) {
+  element.setMaterial(material);
+}
+
 void Mesh::applyBoundaryCondition(const Node& node,
                                   int dofIndex,
                                   double value) {
@@ -59,9 +63,8 @@ void Mesh::generateStiffnessMatrix() {
     }
   }
 
-  // Apply boundary conditions
   for (const auto& bc : boundaryConditions) {
-    const Node* node = bc.first;
+    const Node& node = bc.first;
     for (const auto& [dofIndex, value] : bc.second) {
       int globalIndex = node->getGlobalDOFIndex(dofIndex);
       globalStiffnessMatrix(globalIndex, globalIndex) =
@@ -70,7 +73,6 @@ void Mesh::generateStiffnessMatrix() {
     }
   }
 
-  // Apply loads
   for (const auto& loadPair : loads) {
     const Node* node = loadPair.first;
     for (const auto& load : loadPair.second) {

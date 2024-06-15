@@ -11,23 +11,14 @@
 class Mesh {
 public:
     Mesh();
-
-    // Methods to add nodes and elements
     void addNode(const Node& node);
     void addElement(const Element& element);
-
-    // Methods to apply boundary conditions and loads
-    void applyBoundaryCondition(const Node& node, int dofIndex, double value);
-    void applyLoad(const Node& node, const Load& load);
-
-    // Method to generate the global stiffness matrix
+    void assignMaterial(Element& element, const Material& material);
+    void applyBoundaryCondition(Node& node, int dofIndex, double value);
+    void applyLoad(Node& node, const Load& load);
     void generateStiffnessMatrix();
-
-    // Getters for nodes and elements
     const std::vector<Node>& getNodes() const;
     const std::vector<Element>& getElements() const;
-
-    // Getters for global stiffness matrix and force vector
     const Matrix& getGlobalStiffnessMatrix() const;
     const Vector& getGlobalForceVector() const;
 
@@ -36,8 +27,8 @@ private:
     std::vector<Element> elements;
     Matrix globalStiffnessMatrix;
     Vector globalForceVector;
-    std::unordered_map<const Node*, std::vector<std::pair<int, double>>> boundaryConditions; // Node -> (DOF, value)
-    std::unordered_map<const Node*, std::vector<Load>> loads; // Node -> Loads
+    std::unordered_map<Node, std::vector<std::pair<int, double>>> boundaryConditions;
+    std::unordered_map<Node, std::vector<Load>> loads;
 };
 
 #endif // MESH_H

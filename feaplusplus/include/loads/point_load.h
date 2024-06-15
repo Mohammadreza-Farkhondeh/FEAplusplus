@@ -7,7 +7,6 @@
 class PointLoad : public Load {
 public:
     PointLoad(double fx, double fy, double fz);
-
     void apply(Node& node) const override;
 
 private:
