@@ -1,5 +1,5 @@
 #include "postprocessor.h"
-#include "common/analysis_result.h"
+#include "analysis_result.h"
 
 Postprocessor::Postprocessor() {}
 
@@ -122,19 +122,41 @@ double Postprocessor::calculateElementStrain(
 double Postprocessor::calculateElementMoment(
     const Element& element,
     const Vector& displacementVector) const {
-  // Placeholder implementation
-  // For truss elements, moments are typically zero as they do not resist
-  // bending For beam elements, a more complex calculation is needed considering
-  // beam theory
-  return 0.0;
+  const auto& nodes = element.getNodes();
+  if (nodes.size() != 2) {
+    throw std::invalid_argument(
+        "Element should have exactly two nodes for moment calculation.");
+  }
+
+  double L = (nodes[1]->getCoordinates() - nodes[0]->getCoordinates()).norm();
+  double EI = element.getMaterial().getElasticModulus() *
+              element.getMaterial().getInertia();
+
+  double theta1 = displacementVector[1];  // Rotation at node 1
+  double theta2 = displacementVector[4];  // Rotation at node 2
+
+  double moment = EI / L * (theta2 - theta1);
+
+  return moment;
 }
 
 double Postprocessor::calculateElementShear(
     const Element& element,
     const Vector& displacementVector) const {
-  // Placeholder implementation
-  // For truss elements, shear is typically zero as they do not resist shear
-  // forces For beam elements, a more complex calculation is needed considering
-  // shear force distribution
-  return 0.0;
+  const auto& nodes = element.getNodes();
+  if (nodes.size() != 2) {
+    throw std::invalid_argument(
+        "Element should have exactly two nodes for shear calculation.");
+  }
+
+  double L = (nodes[1]->getCoordinates() - nodes[0]->getCoordinates()).norm();
+  double k = element.getMaterial().getShearModulus() *
+             element.getMaterial().getCrossSectionArea();
+
+  double v1 = displacementVector[2];  // Shear displacement at node 1
+  double v2 = displacementVector[5];  // Shear displacement at node 2
+
+  double shear = k / L * (v2 - v1);
+
+  return shear;
 }
