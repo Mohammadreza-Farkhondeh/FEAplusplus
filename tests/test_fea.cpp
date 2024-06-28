@@ -10,14 +10,12 @@
 
 class FEATest : public ::testing::Test {
 protected:
+    FEATest() 
+        : material(200.0, 0.3, 7800.0, 250.0, 0.01), 
+          nodes{Node(0.0, 0.0, 0.0), Node(1.0, 0.0, 0.0)}, 
+          elements{Element({&nodes[0], &nodes[1]}, material)} {}
+
     void SetUp() override {
-        nodes.emplace_back(Node(0.0, 0.0, 0.0));
-        nodes.emplace_back(Node(1.0, 0.0, 0.0));
-
-        material = Material(200.0, 0.3, 7800.0, 250.0);
-
-        elements.emplace_back(Element({&nodes[0], &nodes[1]}, material));
-
         mesh.addNode(nodes[0]);
         mesh.addNode(nodes[1]);
         mesh.addElement(elements[0]);
@@ -43,12 +41,12 @@ TEST_F(FEATest, AddNodesAndElements) {
 
 TEST_F(FEATest, ApplyBoundaryConditions) {
     const auto& bc = mesh.getBoundaryConditions();
-    EXPECT_EQ(bc.at(&nodes[0]).size(), 3);
+    EXPECT_EQ(bc.at(nodes[0]).size(), 3);
 }
 
 TEST_F(FEATest, ApplyLoads) {
     const auto& loads = mesh.getLoads();
-    EXPECT_EQ(loads.at(&nodes[1]).size(), 1);
+    EXPECT_EQ(loads.at(nodes[1]).size(), 1);
 }
 
 TEST_F(FEATest, GenerateStiffnessMatrixAndForceVector) {
@@ -68,6 +66,8 @@ TEST_F(FEATest, GenerateStiffnessMatrixAndForceVector) {
 
 class FEASolverTest : public FEATest {
 protected:
+    FEASolverTest() = default;
+
     void SetUp() override {
         FEATest::SetUp();
         mesh.generateStiffnessMatrix();

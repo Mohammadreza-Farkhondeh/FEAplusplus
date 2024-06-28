@@ -48,7 +48,7 @@ TEST(DistributedLoadTest, ApplyUniformDistributedLoad) {
     }
 
     for (Node* node : nodes) {
-        std::vector<double> loads = node.getLoads();
+        std::vector<double> loads = node->getLoads();
         EXPECT_DOUBLE_EQ(loads[0], 100.0);
         EXPECT_DOUBLE_EQ(loads[1], 100.0);
         EXPECT_DOUBLE_EQ(loads[2], 100.0);
