@@ -18,11 +18,3 @@ void FEA::analyze() {
     std::cerr << "No solver set!" << std::endl;
   }
 }
-
-void FEA::visualizeResults() {
-  postprocessor.visualize(mesh);
-}
-
-void FEA::generateReport() {
-  postprocessor.generateReport(mesh);
-}
