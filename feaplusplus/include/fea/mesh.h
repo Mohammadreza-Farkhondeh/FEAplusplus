@@ -21,6 +21,12 @@ public:
     const std::vector<Element>& getElements() const;
     const Matrix& getGlobalStiffnessMatrix() const;
     const Vector& getGlobalForceVector() const;
+    const std::unordered_map<Node, std::vector<std::pair<int, double>>>& getBoundaryConditions() const {
+        return boundaryConditions;
+    }
+    const std::unordered_map<Node, std::vector<Load>>& getLoads() const {
+        return loads;
+    }
 
 private:
     std::vector<Node> nodes;

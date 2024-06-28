@@ -6,7 +6,7 @@
 class Node {
 public:
     Node(double x, double y, double z);
-    
+
     void applyBoundaryCondition(int dofIndex, double value);
     void setDisplacement(int dofIndex, double displacement);
     double getDisplacement(int dofIndex) const;

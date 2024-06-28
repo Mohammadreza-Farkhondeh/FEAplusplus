@@ -9,6 +9,9 @@ const std::vector<Node*>& Element::getNodes() const {
   return nodes;
 }
 
+Material Element::getMaterial() const {
+  return material;
+}
 Matrix Element::computeStiffnessMatrix() const {
   size_t numNodes = nodes.size();
   size_t dofPerNode = 3;

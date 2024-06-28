@@ -14,6 +14,7 @@ public:
     Matrix computeStiffnessMatrix() const;
     void assemble(Matrix& globalStiffnessMatrix, const std::vector<int>& dofMap) const;
     std::vector<int> getDOFMap() const;
+    Material getMaterial() const;
 
 private:
     std::vector<Node*> nodes;
