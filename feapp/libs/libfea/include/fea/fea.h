@@ -2,7 +2,7 @@
 #define FEA_H
 
 #include "fea/mesh.h"
-#include "postprocessor/postprocessor.h"
+#include "processor/postprocessor.h"
 #include "solvers/solver.h"
 
 class FEA {
