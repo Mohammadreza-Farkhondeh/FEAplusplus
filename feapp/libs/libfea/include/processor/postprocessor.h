@@ -17,6 +17,10 @@ class Postprocessor {
   std::vector<AnalysisResult> calculateShears(const Mesh& mesh);
 
  private:
+  double getLength(const Node* node1, const Node* node2) const;
+  double getLengthWithDisplacement(const Node* node1,
+                                   const Node* node2,
+                                   const Vector& displacementVector) const;
   double calculateElementStress(const Element& element,
                                 const Vector& displacementVector) const;
   double calculateElementStrain(const Element& element,
