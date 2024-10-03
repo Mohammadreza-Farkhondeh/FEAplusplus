@@ -1,6 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include <memory>
 #include <unordered_map>
 #include <vector>
 #include "common/common.h"
@@ -14,10 +15,11 @@ class Mesh {
 
   void addNode(const Node& node);
   void addElement(const Element& element);
+  Node& getNode(int nodeId);
 
   void assignMaterial(Element& element, const Material& material);
   void applyBoundaryCondition(int nodeId, int dofIndex, double value);
-  void applyLoad(int nodeId, const Load& load);
+  void applyLoad(int nodeId, const std::shared_ptr<Load> load);
 
   void generateStiffnessMatrix();
 
@@ -31,7 +33,8 @@ class Mesh {
     return boundaryConditions;
   }
 
-  const std::unordered_map<int, std::vector<Load>>& getLoads() const {
+  const std::unordered_map<int, std::vector<std::shared_ptr<Load>>>& getLoads()
+      const {
     return loads;
   }
 
@@ -42,7 +45,8 @@ class Mesh {
   Vector globalForceVector;
   std::unordered_map<int, std::vector<std::pair<int, double>>>
       boundaryConditions;  // Node ID -> Boundary conditions
-  std::unordered_map<int, std::vector<Load>> loads;  // Node ID -> Loads
+  std::unordered_map<int, std::vector<std::shared_ptr<Load>>>
+      loads;  // Node ID -> Loads
 };
 
 #endif  // MESH_H
