@@ -2,9 +2,11 @@
 #define ANALYSIS_RESULT_H
 
 #include <vector>
+#include "geometry/node.h"
 
 struct AnalysisResult {
-  int elementId;
+  const Node* node1;
+  const Node* node2;
   double stress;
   double strain;
   double moment;

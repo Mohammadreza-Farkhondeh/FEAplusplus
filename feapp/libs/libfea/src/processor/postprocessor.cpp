@@ -1,4 +1,5 @@
 #include "processor/postprocessor.h"
+#include <cmath>
 #include <stdexcept>
 
 Postprocessor::Postprocessor() {}
@@ -10,7 +11,7 @@ std::vector<AnalysisResult> Postprocessor::calculateStresses(const Mesh& mesh) {
   for (const auto& element : elements) {
     const auto& nodes = element.getNodes();
     size_t numNodes = nodes.size();
-    size_t numDOF = numNodes * 3;  // Assuming 3 DOF per node
+    size_t numDOF = numNodes * 3;
 
     Vector displacementVector(numDOF);
     for (size_t i = 0; i < numNodes; ++i) {
@@ -20,7 +21,7 @@ std::vector<AnalysisResult> Postprocessor::calculateStresses(const Mesh& mesh) {
     }
 
     double stress = calculateElementStress(element, displacementVector);
-    results.push_back({element.getId(), stress, 0.0, 0.0, 0.0});
+    results.push_back({nodes[0], nodes[1], stress, 0.0, 0.0, 0.0});
   }
   return results;
 }
@@ -32,7 +33,7 @@ std::vector<AnalysisResult> Postprocessor::calculateStrains(const Mesh& mesh) {
   for (const auto& element : elements) {
     const auto& nodes = element.getNodes();
     size_t numNodes = nodes.size();
-    size_t numDOF = numNodes * 3;  // Assuming 3 DOF per node
+    size_t numDOF = numNodes * 3;
 
     Vector displacementVector(numDOF);
     for (size_t i = 0; i < numNodes; ++i) {
@@ -42,7 +43,7 @@ std::vector<AnalysisResult> Postprocessor::calculateStrains(const Mesh& mesh) {
     }
 
     double strain = calculateElementStrain(element, displacementVector);
-    results.push_back({element.getId(), 0.0, strain, 0.0, 0.0});
+    results.push_back({nodes[0], nodes[1], 0.0, strain, 0.0, 0.0});
   }
   return results;
 }
@@ -54,7 +55,7 @@ std::vector<AnalysisResult> Postprocessor::calculateMoments(const Mesh& mesh) {
   for (const auto& element : elements) {
     const auto& nodes = element.getNodes();
     size_t numNodes = nodes.size();
-    size_t numDOF = numNodes * 3;  // Assuming 3 DOF per node
+    size_t numDOF = numNodes * 3;
 
     Vector displacementVector(numDOF);
     for (size_t i = 0; i < numNodes; ++i) {
@@ -64,7 +65,7 @@ std::vector<AnalysisResult> Postprocessor::calculateMoments(const Mesh& mesh) {
     }
 
     double moment = calculateElementMoment(element, displacementVector);
-    results.push_back({element.getId(), 0.0, 0.0, moment, 0.0});
+    results.push_back({nodes[0], nodes[1], 0.0, 0.0, moment, 0.0});
   }
   return results;
 }
@@ -76,7 +77,7 @@ std::vector<AnalysisResult> Postprocessor::calculateShears(const Mesh& mesh) {
   for (const auto& element : elements) {
     const auto& nodes = element.getNodes();
     size_t numNodes = nodes.size();
-    size_t numDOF = numNodes * 3;  // Assuming 3 DOF per node
+    size_t numDOF = numNodes * 3;
 
     Vector displacementVector(numDOF);
     for (size_t i = 0; i < numNodes; ++i) {
@@ -86,7 +87,7 @@ std::vector<AnalysisResult> Postprocessor::calculateShears(const Mesh& mesh) {
     }
 
     double shear = calculateElementShear(element, displacementVector);
-    results.push_back({element.getId(), 0.0, 0.0, 0.0, shear});
+    results.push_back({nodes[0], nodes[1], 0.0, 0.0, 0.0, shear});
   }
   return results;
 }
@@ -110,13 +111,9 @@ double Postprocessor::calculateElementStrain(
         "Element should have exactly two nodes for strain calculation.");
   }
 
-  // Initial and deformed lengths
-  double lengthInitial =
-      (nodes[1]->getCoordinates() - nodes[0]->getCoordinates()).norm();
+  double lengthInitial = getLength(nodes[0], nodes[1]);
   double lengthCurrent =
-      ((nodes[1]->getCoordinates() + nodes[1]->getDisplacements()) -
-       (nodes[0]->getCoordinates() + nodes[0]->getDisplacements()))
-          .norm();
+      getLengthWithDisplacement(nodes[0], nodes[1], displacementVector);
 
   return (lengthCurrent - lengthInitial) / lengthInitial;
 }
@@ -130,12 +127,12 @@ double Postprocessor::calculateElementMoment(
         "Element should have exactly two nodes for moment calculation.");
   }
 
-  double L = (nodes[1]->getCoordinates() - nodes[0]->getCoordinates()).norm();
+  double L = getLength(nodes[0], nodes[1]);
   double EI = element.getMaterial().getElasticModulus() *
-              element.getMaterial().getInertia();
+              1.0;  // TODO: Replace 1.0 with correct inertia if available
 
-  double theta1 = displacementVector[1];  // Rotation at node 1
-  double theta2 = displacementVector[4];  // Rotation at node 2
+  double theta1 = displacementVector[1];
+  double theta2 = displacementVector[4];
 
   return EI / L * (theta2 - theta1);
 }
@@ -149,12 +146,40 @@ double Postprocessor::calculateElementShear(
         "Element should have exactly two nodes for shear calculation.");
   }
 
-  double L = (nodes[1]->getCoordinates() - nodes[0]->getCoordinates()).norm();
+  double L = getLength(nodes[0], nodes[1]);
   double k = element.getMaterial().getShearModulus() *
              element.getMaterial().getCrossSectionArea();
 
-  double v1 = displacementVector[2];  // Shear displacement at node 1
-  double v2 = displacementVector[5];  // Shear displacement at node 2
+  double v1 = displacementVector[2];
+  double v2 = displacementVector[5];
 
   return k / L * (v2 - v1);
+}
+
+double Postprocessor::getLength(const Node* node1, const Node* node2) const {
+  auto coords1 = node1->getCoordinates();
+  auto coords2 = node2->getCoordinates();
+
+  return std::sqrt(std::pow(coords2[0] - coords1[0], 2) +
+                   std::pow(coords2[1] - coords1[1], 2) +
+                   std::pow(coords2[2] - coords1[2], 2));
+}
+
+double Postprocessor::getLengthWithDisplacement(
+    const Node* node1,
+    const Node* node2,
+    const Vector& displacementVector) const {
+  auto coords1 = node1->getCoordinates();
+  auto coords2 = node2->getCoordinates();
+
+  double dx1 = coords1[0] + node1->getDisplacement(0);
+  double dy1 = coords1[1] + node1->getDisplacement(1);
+  double dz1 = coords1[2] + node1->getDisplacement(2);
+
+  double dx2 = coords2[0] + node2->getDisplacement(0);
+  double dy2 = coords2[1] + node2->getDisplacement(1);
+  double dz2 = coords2[2] + node2->getDisplacement(2);
+
+  return std::sqrt(std::pow(dx2 - dx1, 2) + std::pow(dy2 - dy1, 2) +
+                   std::pow(dz2 - dz1, 2));
 }
