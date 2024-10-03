@@ -1,6 +1,7 @@
 #include "geometry/element.h"
-
+#include <array>
 #include <cmath>
+#include <vector>
 
 Element::Element(const std::vector<Node*>& nodes, const Material& material)
     : nodes(nodes), material(material) {}
@@ -12,25 +13,53 @@ const std::vector<Node*>& Element::getNodes() const {
 Material Element::getMaterial() const {
   return material;
 }
+
 Matrix Element::computeStiffnessMatrix() const {
-  size_t numNodes = nodes.size();
-  size_t dofPerNode = 3;
-  size_t totalDof = numNodes * dofPerNode;
+  const size_t numNodes = nodes.size();
+  const size_t dofPerNode = 3;
+  const size_t totalDof = numNodes * dofPerNode;
 
   Matrix stiffnessMatrix(totalDof, std::vector<double>(totalDof, 0.0));
 
-  std::vector<double> x1 = nodes[0]->getCoordinates();
-  std::vector<double> x2 = nodes[1]->getCoordinates();
-  double L = std::sqrt(std::pow(x2[0] - x1[0], 2) + std::pow(x2[1] - x1[1], 2) +
-                       std::pow(x2[2] - x1[2], 2));
+  const auto x1 = nodes[0]->getCoordinates();
+  const auto x2 = nodes[1]->getCoordinates();
+  const double L = computeLength(x1, x2);
 
-  double l = (x2[0] - x1[0]) / L;
-  double m = (x2[1] - x1[1]) / L;
-  double n = (x2[2] - x1[2]) / L;
+  const auto directionCosines = computeDirectionCosines(x1, x2, L);
+  const double EA_L = computeEA_L(material, L);
 
-  double E = material.getElasticModulus();
-  double A = material.getCrossSectionArea();
-  double EA_L = (E * A) / L;
+  const Matrix k_local = computeLocalStiffnessMatrix(directionCosines, EA_L);
+
+  assembleGlobalStiffnessMatrix(stiffnessMatrix, k_local, totalDof, dofPerNode);
+
+  return stiffnessMatrix;
+}
+
+double Element::computeLength(const std::array<double, 3>& x1,
+                              const std::array<double, 3>& x2) const {
+  return std::sqrt(std::pow(x2[0] - x1[0], 2) + std::pow(x2[1] - x1[1], 2) +
+                   std::pow(x2[2] - x1[2], 2));
+}
+
+std::array<double, 3> Element::computeDirectionCosines(
+    const std::array<double, 3>& x1,
+    const std::array<double, 3>& x2,
+    double L) const {
+  return {(x2[0] - x1[0]) / L, (x2[1] - x1[1]) / L, (x2[2] - x1[2]) / L};
+}
+
+double Element::computeEA_L(const Material& material, double L) const {
+  const double E = material.getElasticModulus();
+  const double A = material.getCrossSectionArea();
+  return (E * A) / L;
+}
+
+Matrix Element::computeLocalStiffnessMatrix(
+    const std::array<double, 3>& directionCosines,
+    double EA_L) const {
+  const double l = directionCosines[0];
+  const double m = directionCosines[1];
+  const double n = directionCosines[2];
 
   Matrix k_local = {{l * l, l * m, l * n, -l * l, -l * m, -l * n},
                     {m * l, m * m, m * n, -m * l, -m * m, -m * n},
@@ -45,18 +74,23 @@ Matrix Element::computeStiffnessMatrix() const {
     }
   }
 
+  return k_local;
+}
+
+void Element::assembleGlobalStiffnessMatrix(Matrix& stiffnessMatrix,
+                                            const Matrix& k_local,
+                                            size_t totalDof,
+                                            size_t dofPerNode) const {
   for (size_t i = 0; i < totalDof; ++i) {
     for (size_t j = 0; j < totalDof; ++j) {
       stiffnessMatrix[i][j] = k_local[i % dofPerNode][j % dofPerNode];
     }
   }
-
-  return stiffnessMatrix;
 }
 
 void Element::assemble(Matrix& globalStiffnessMatrix,
                        const std::vector<int>& dofMap) const {
-  Matrix localStiffnessMatrix = computeStiffnessMatrix();
+  const Matrix localStiffnessMatrix = computeStiffnessMatrix();
   for (size_t i = 0; i < dofMap.size(); ++i) {
     for (size_t j = 0; j < dofMap.size(); ++j) {
       globalStiffnessMatrix[dofMap[i]][dofMap[j]] += localStiffnessMatrix[i][j];

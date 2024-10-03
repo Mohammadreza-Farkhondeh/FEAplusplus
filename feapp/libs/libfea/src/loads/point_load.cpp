@@ -1,4 +1,4 @@
-#include "point_load.h"
+#include "loads/point_load.h"
 
 PointLoad::PointLoad(double fx, double fy, double fz)
     : fx(fx), fy(fy), fz(fz) {}

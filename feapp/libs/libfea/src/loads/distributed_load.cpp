@@ -1,4 +1,4 @@
-#include "distributed_load.h"
+#include "loads/distributed_load.h"
 
 #include <stdexcept>
 
@@ -26,27 +26,23 @@ void DistributedLoad::apply(Node& node) const {
   for (size_t i = 0; i < nodes.size(); ++i) {
     nodes[i]->applyLoad(loads[i], loads[i], loads[i]);
   }
+}
 
-  ""
-  "
-      // Example of a uniform load distribution function
-      std::vector<double>
-      uniformLoadDistribution(const std::vector<Node*>& nodes) {
-    double totalLoad = 100.0;  // Example total load
-    std::vector<double> loads(nodes.size(), totalLoad / nodes.size());
-    return loads;
-  }
+// Example of a uniform load distribution function
+std::vector<double> uniformLoadDistribution(const std::vector<Node*>& nodes) {
+  double totalLoad = 100.0;  // Example total load
+  std::vector<double> loads(nodes.size(), totalLoad / nodes.size());
+  return loads;
+}
 
-  // Example of a linearly varying load distribution function
-  std::vector<double> linearLoadDistribution(const std::vector<Node*>& nodes) {
-    std::vector<double> loads;
-    double totalLoad = 100.0;  // Example total load
-    double totalLength =
-        nodes.size();  // Simplified, in practice use actual length
-    for (size_t i = 0; i < nodes.size(); ++i) {
-      loads.push_back(totalLoad * (i + 1) / totalLength);
-    }
-    return loads;
+// Example of a linearly varying load distribution function
+std::vector<double> linearLoadDistribution(const std::vector<Node*>& nodes) {
+  std::vector<double> loads;
+  double totalLoad = 100.0;  // Example total load
+  double totalLength =
+      nodes.size();  // Simplified, in practice use actual length
+  for (size_t i = 0; i < nodes.size(); ++i) {
+    loads.push_back(totalLoad * (i + 1) / totalLength);
   }
-  ""
-  "
+  return loads;
+}

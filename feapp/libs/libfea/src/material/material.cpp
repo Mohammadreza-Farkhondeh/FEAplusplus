@@ -1,28 +1,36 @@
 #include "material/material.h"
 
-Material::Material(double elasticModulus, double poissonRatio, double density, double yieldStrength, double crossSectionArea)
-    : elasticModulus(elasticModulus), poissonRatio(poissonRatio), density(density), yieldStrength(yieldStrength), crossSectionArea(crossSectionArea) {}
+Material::Material(double elasticModulus,
+                   double poissonRatio,
+                   double density,
+                   double yieldStrength,
+                   double crossSectionArea)
+    : elasticModulus(elasticModulus),
+      poissonRatio(poissonRatio),
+      density(density),
+      yieldStrength(yieldStrength),
+      crossSectionArea(crossSectionArea) {}
 
 double Material::getElasticModulus() const {
-    return elasticModulus;
+  return elasticModulus;
 }
 
 double Material::getPoissonRatio() const {
-    return poissonRatio;
+  return poissonRatio;
 }
 
 double Material::getDensity() const {
-    return density;
+  return density;
 }
 
 double Material::getYieldStrength() const {
-    return yieldStrength;
+  return yieldStrength;
 }
 
 double Material::getShearModulus() const {
-    return elasticModulus / (2 * (1 + poissonRatio));
+  return elasticModulus / (2 * (1 + poissonRatio));
 }
 
 double Material::getCrossSectionArea() const {
-    return crossSectionArea;
+  return crossSectionArea;
 }
