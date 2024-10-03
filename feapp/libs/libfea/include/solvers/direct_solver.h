@@ -4,8 +4,8 @@
 #include "solvers/solver.h"
 
 class DirectSolver : public Solver {
-public:
-    void solve(const Mesh& mesh) const override;
+ public:
+  void solve(const Mesh& mesh) const override;
 };
 
-#endif // DIRECT_SOLVER_H
+#endif  // DIRECT_SOLVER_H

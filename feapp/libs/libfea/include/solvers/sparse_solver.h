@@ -4,8 +4,8 @@
 #include "solvers/solver.h"
 
 class SparseSolver : public Solver {
-public:
-    void solve(const Mesh& mesh) const override;
+ public:
+  void solve(const Mesh& mesh) const override;
 };
 
-#endif // SPARSE_SOLVER_H
+#endif  // SPARSE_SOLVER_H

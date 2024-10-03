@@ -1,5 +1,4 @@
 #include "fea/mesh.h"
-
 #include <stdexcept>
 
 Mesh::Mesh() : globalStiffnessMatrix(), globalForceVector() {}
@@ -16,34 +15,27 @@ void Mesh::assignMaterial(Element& element, const Material& material) {
   element.setMaterial(material);
 }
 
-void Mesh::applyBoundaryCondition(const Node& node,
-                                  int dofIndex,
-                                  double value) {
-  for (auto& n : nodes) {
-    if (n.getCoordinates() == node.getCoordinates()) {
-      n.applyBoundaryCondition(dofIndex, value);
-      boundaryConditions[&n].emplace_back(dofIndex, value);
-      break;
-    }
+void Mesh::applyBoundaryCondition(int nodeId, int dofIndex, double value) {
+  if (nodeId < 0 || nodeId >= nodes.size()) {
+    throw std::out_of_range("Invalid nodeId");
   }
+  nodes[nodeId].applyBoundaryCondition(dofIndex, value);
+  boundaryConditions[nodeId].emplace_back(dofIndex, value);
 }
 
-void Mesh::applyLoad(const Node& node, const Load& load) {
-  for (auto& n : nodes) {
-    if (n.getCoordinates() == node.getCoordinates()) {
-      loads[&n].push_back(load);
-      load.apply(n);
-      break;
-    }
+void Mesh::applyLoad(int nodeId, const Load& load) {
+  if (nodeId < 0 || nodeId >= nodes.size()) {
+    throw std::out_of_range("Invalid nodeId");
   }
+  loads[nodeId].push_back(load);
+  load.apply(nodes[nodeId]);
 }
 
 void Mesh::generateStiffnessMatrix() {
-  int totalDOF = nodes.size() * 3;  // Assuming 3 DOF per node (x, y, z)
+  int totalDOF = nodes.size() * 3;
   globalStiffnessMatrix.resize(totalDOF, totalDOF);
   globalForceVector.resize(totalDOF);
 
-  // Initialize stiffness matrix and force vector to zero
   for (int i = 0; i < totalDOF; ++i) {
     for (int j = 0; j < totalDOF; ++j) {
       globalStiffnessMatrix(i, j) = 0.0;
@@ -51,7 +43,6 @@ void Mesh::generateStiffnessMatrix() {
     globalForceVector(i) = 0.0;
   }
 
-  // Assemble the global stiffness matrix
   for (const auto& element : elements) {
     Matrix elementStiffness = element.computeStiffnessMatrix();
     std::vector<int> dofMap = element.getDOFMap();
@@ -64,19 +55,19 @@ void Mesh::generateStiffnessMatrix() {
   }
 
   for (const auto& bc : boundaryConditions) {
-    const Node& node = bc.first;
+    int nodeId = bc.first;
+    const Node& node = nodes[nodeId];
     for (const auto& [dofIndex, value] : bc.second) {
-      int globalIndex = node->getGlobalDOFIndex(dofIndex);
-      globalStiffnessMatrix(globalIndex, globalIndex) =
-          1e30;  // Large number to simulate fixed DOF
+      int globalIndex = node.getGlobalDOFIndex(dofIndex);
+      globalStiffnessMatrix(globalIndex, globalIndex) = 1e30;
       globalForceVector(globalIndex) = value * 1e30;
     }
   }
 
   for (const auto& loadPair : loads) {
-    const Node* node = loadPair.first;
+    int nodeId = loadPair.first;
     for (const auto& load : loadPair.second) {
-      load.apply(*const_cast<Node*>(node));
+      load.apply(nodes[nodeId]);
     }
   }
 }

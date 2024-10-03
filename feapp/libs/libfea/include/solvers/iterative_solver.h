@@ -4,8 +4,8 @@
 #include "solvers/solver.h"
 
 class IterativeSolver : public Solver {
-public:
-    void solve(const Mesh& mesh) const override;
+ public:
+  void solve(const Mesh& mesh) const override;
 };
 
-#endif // ITERATIVE_SOLVER_H
+#endif  // ITERATIVE_SOLVER_H

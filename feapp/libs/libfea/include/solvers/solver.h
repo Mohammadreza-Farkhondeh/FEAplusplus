@@ -4,8 +4,8 @@
 #include "fea/mesh.h"
 
 class Solver {
-public:
-    virtual void solve(const Mesh& mesh) const = 0;
+ public:
+  virtual void solve(const Mesh& mesh) const = 0;
 };
 
-#endif // SOLVER_H
+#endif  // SOLVER_H

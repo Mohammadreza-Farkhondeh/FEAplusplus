@@ -1,11 +1,12 @@
-#include "analysis_result.h"
-#include "postprocessor.h"
+#include "processor/postprocessor.h"
+#include <stdexcept>
 
 Postprocessor::Postprocessor() {}
 
 std::vector<AnalysisResult> Postprocessor::calculateStresses(const Mesh& mesh) {
   std::vector<AnalysisResult> results;
   const auto& elements = mesh.getElements();
+
   for (const auto& element : elements) {
     const auto& nodes = element.getNodes();
     size_t numNodes = nodes.size();
@@ -27,6 +28,7 @@ std::vector<AnalysisResult> Postprocessor::calculateStresses(const Mesh& mesh) {
 std::vector<AnalysisResult> Postprocessor::calculateStrains(const Mesh& mesh) {
   std::vector<AnalysisResult> results;
   const auto& elements = mesh.getElements();
+
   for (const auto& element : elements) {
     const auto& nodes = element.getNodes();
     size_t numNodes = nodes.size();
@@ -48,6 +50,7 @@ std::vector<AnalysisResult> Postprocessor::calculateStrains(const Mesh& mesh) {
 std::vector<AnalysisResult> Postprocessor::calculateMoments(const Mesh& mesh) {
   std::vector<AnalysisResult> results;
   const auto& elements = mesh.getElements();
+
   for (const auto& element : elements) {
     const auto& nodes = element.getNodes();
     size_t numNodes = nodes.size();
@@ -69,6 +72,7 @@ std::vector<AnalysisResult> Postprocessor::calculateMoments(const Mesh& mesh) {
 std::vector<AnalysisResult> Postprocessor::calculateShears(const Mesh& mesh) {
   std::vector<AnalysisResult> results;
   const auto& elements = mesh.getElements();
+
   for (const auto& element : elements) {
     const auto& nodes = element.getNodes();
     size_t numNodes = nodes.size();
@@ -94,9 +98,7 @@ double Postprocessor::calculateElementStress(
   double E = material.getElasticModulus();
 
   double strain = calculateElementStrain(element, displacementVector);
-  double stress = E * strain;
-
-  return stress;
+  return E * strain;  // Hooke's Law: stress = E * strain
 }
 
 double Postprocessor::calculateElementStrain(
@@ -108,6 +110,7 @@ double Postprocessor::calculateElementStrain(
         "Element should have exactly two nodes for strain calculation.");
   }
 
+  // Initial and deformed lengths
   double lengthInitial =
       (nodes[1]->getCoordinates() - nodes[0]->getCoordinates()).norm();
   double lengthCurrent =
@@ -115,8 +118,7 @@ double Postprocessor::calculateElementStrain(
        (nodes[0]->getCoordinates() + nodes[0]->getDisplacements()))
           .norm();
 
-  double strain = (lengthCurrent - lengthInitial) / lengthInitial;
-  return strain;
+  return (lengthCurrent - lengthInitial) / lengthInitial;
 }
 
 double Postprocessor::calculateElementMoment(
@@ -135,9 +137,7 @@ double Postprocessor::calculateElementMoment(
   double theta1 = displacementVector[1];  // Rotation at node 1
   double theta2 = displacementVector[4];  // Rotation at node 2
 
-  double moment = EI / L * (theta2 - theta1);
-
-  return moment;
+  return EI / L * (theta2 - theta1);
 }
 
 double Postprocessor::calculateElementShear(
@@ -156,7 +156,5 @@ double Postprocessor::calculateElementShear(
   double v1 = displacementVector[2];  // Shear displacement at node 1
   double v2 = displacementVector[5];  // Shear displacement at node 2
 
-  double shear = k / L * (v2 - v1);
-
-  return shear;
+  return k / L * (v2 - v1);
 }

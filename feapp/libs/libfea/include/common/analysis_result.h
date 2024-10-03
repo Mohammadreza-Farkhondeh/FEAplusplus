@@ -4,11 +4,11 @@
 #include <vector>
 
 struct AnalysisResult {
-    int elementId;
-    double stress;
-    double strain;
-    double moment;
-    double shear;
+  int elementId;
+  double stress;
+  double strain;
+  double moment;
+  double shear;
 };
 
-#endif // ANALYSIS_RESULT_H
+#endif  // ANALYSIS_RESULT_H
