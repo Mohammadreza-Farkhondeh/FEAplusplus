@@ -14,6 +14,10 @@ Material Element::getMaterial() const {
   return material;
 }
 
+void Element::setMaterial(const Material& newMaterial) {
+  material = newMaterial;
+}
+
 Matrix Element::computeStiffnessMatrix() const {
   const size_t numNodes = nodes.size();
   const size_t dofPerNode = 3;

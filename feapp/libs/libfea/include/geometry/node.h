@@ -8,7 +8,6 @@ class Node {
  public:
   Node(double x, double y, double z);
   int id;
-
   bool operator==(const Node& other) const;
 
   void applyBoundaryCondition(int dofIndex, double value);
